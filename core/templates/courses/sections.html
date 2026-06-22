@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Tracks — Edflix{% endblock %}
+{% block content %}
+<div class="container sections-page">
+  <div class="sections-header animate-on-scroll">
+    <h1>Welcome back, {{ current_user.name }}</h1>
+    <p>Choose a learning track to explore your courses</p>
+  </div>
+  <div class="sections-grid stagger-children animate-on-scroll">
+    {% for section in sections %}
+    <a href="{% url 'section_courses' section.key %}" class="section-card" style="--i:{{ forloop.counter0 }}">
+      <div class="section-short">{{ section.short }}</div>
+      <div class="section-label">{{ section.label }}</div>
+      <p class="section-desc">{{ section.description }}</p>
+      <div class="section-cta">
+        Explore courses
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

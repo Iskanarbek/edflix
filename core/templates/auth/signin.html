@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Edflix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/premium.css' %}">
+</head>
+<body class="auth-body">
+  <div class="auth-split">
+    <div class="auth-left">
+      <a href="/" class="logo auth-logo"><span class="logo-ed">Ed</span><span class="logo-flix">flix</span></a>
+      <div class="auth-left-content">
+        <h2>Welcome back.</h2>
+        <p>Your courses, your progress, and your learning path are waiting for you.</p>
+        <ul class="auth-perks">
+          <li><span class="perk-check">✓</span> Pick up exactly where you left off</li>
+          <li><span class="perk-check">✓</span> Access all your unlocked lessons</li>
+          <li><span class="perk-check">✓</span> Check your test scores</li>
+          <li><span class="perk-check">✓</span> Continue at your own pace</li>
+        </ul>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form-wrap">
+        <h1 class="auth-title">Sign in to Edflix</h1>
+        <p class="auth-subtitle">Don't have an account? <a href="{% url 'signup' %}" class="auth-link">Sign up for free</a></p>
+
+        <form method="post" class="auth-form" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="form-group">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="form-error">{{ field.errors.0 }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/premium.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — Edflix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/management.css' %}">
+</head>
+<body class="panel-login-body">
+  <div class="panel-login-card">
+    <div class="panel-login-logo">
+      <span class="logo-ed">Ed</span><span class="logo-flix">flix</span>
+      <span class="panel-login-tag">Admin</span>
+    </div>
+    <h1 class="panel-login-title">Admin Access</h1>
+    <p class="panel-login-sub">Platform administration portal</p>
+
+    {% if error %}
+    <div class="auth-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" class="panel-login-form">
+      {% csrf_token %}
+      <div class="panel-field">
+        <label class="panel-label">Email</label>
+        <input type="email" name="email" class="panel-input" placeholder="admin@edflix.com" required autofocus>
+      </div>
+      <div class="panel-field">
+        <label class="panel-label">Password</label>
+        <input type="password" name="password" class="panel-input" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-panel-primary" style="width:100%;justify-content:center;padding:13px;">
+        Sign In
+      </button>
+    </form>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(231,94,36,0.12);text-align:center;">
+      <a href="{% url 'teacher_login' %}" style="color:#9CA3AF;font-size:0.82rem;">Teacher login</a>
+      <span style="color:#D1D5DB;margin:0 8px;">·</span>
+      <a href="{% url 'signin' %}" style="color:#9CA3AF;font-size:0.82rem;">Student login</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Course Agreement — {{ course.title }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
+{% block content %}
+<div class="agreement-page">
+  <div class="agreement-wrap">
+
+    {% if course.intro_video %}
+    <div class="intro-video-section">
+      <h2 class="intro-video-title">A message from your instructor</h2>
+      <p class="intro-video-sub">Please watch this introduction before enrolling in <strong>{{ course.title }}</strong>.</p>
+      <div class="video-player-wrap">
+        <video controls controlsList="nodownload" class="intro-video-player">
+          <source src="{{ course.intro_video.url }}">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="agreement-card">
+      <div class="agreement-header">
+        <div class="agreement-shield">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h1>Enrollment Agreement</h1>
+        <p class="agreement-course-name">{{ course.title }}</p>
+      </div>
+
+      <div class="agreement-body">
+        <div class="agreement-text">
+          <h3>Terms of Access &amp; Intellectual Property Agreement</h3>
+          <p>This Enrollment Agreement ("Agreement") is entered into between you ("Learner") and Edflix ("Platform") as a binding legal contract governing your access to the course materials contained within <strong>{{ course.title }}</strong>.</p>
+
+          <h4>1. Intellectual Property &amp; Content Protection</h4>
+          <p>All video content, written materials, practice tests, downloadable files, and any other educational resources made available through this course are the exclusive intellectual property of Edflix and/or its licensed instructors. These materials are protected under applicable copyright law, international treaties, and intellectual property regulations.</p>
+
+          <h4>2. Prohibited Activities</h4>
+          <p>By enrolling in this course, you expressly agree that you will <strong>not</strong>, under any circumstances:</p>
+          <ul>
+            <li>Record, capture, screenshot, or otherwise reproduce course video content by any means;</li>
+            <li>Copy, redistribute, resell, sublicense, or share course materials — in whole or in part — with any third party;</li>
+            <li>Upload, publish, or transmit course content to any website, platform, messaging service, or social media channel;</li>
+            <li>Use course materials for commercial purposes or for the creation of derivative works without prior written consent from Edflix;</li>
+            <li>Circumvent or attempt to circumvent any access controls or technical protection measures implemented by the Platform.</li>
+          </ul>
+
+          <h4>3. Legal Consequences</h4>
+          <p>Any unauthorized reproduction, distribution, or disclosure of course materials constitutes a serious violation of intellectual property law. Edflix reserves the right to pursue all available civil and criminal remedies against individuals found to be in breach of this Agreement, including but not limited to:</p>
+          <ul>
+            <li>Immediate and permanent termination of your account without refund;</li>
+            <li>Claims for statutory and actual damages under applicable copyright law;</li>
+            <li>Referral of the matter to competent legal authorities for criminal prosecution;</li>
+            <li>Recovery of all legal costs and attorney's fees incurred by Edflix.</li>
+          </ul>
+          <p>Violations will be pursued vigorously. Edflix maintains audit logs, access records, and technical fingerprinting systems to identify and act against unauthorized use.</p>
+
+          <h4>4. AI Training Data</h4>
+          <p>By accepting this Agreement, you acknowledge and consent that anonymized, aggregated data derived from your interactions with this platform — including but not limited to lesson completion patterns, test responses, and engagement metrics — may be used to improve and train Edflix's AI and recommendation systems. No personally identifiable information will be used in any AI training dataset without additional explicit consent.</p>
+
+          <h4>5. Account Security</h4>
+          <p>You are responsible for maintaining the confidentiality of your account credentials. Sharing account access with any other person constitutes a violation of this Agreement and may result in immediate account termination.</p>
+
+          <h4>6. Governing Law</h4>
+          <p>This Agreement shall be governed by and construed in accordance with applicable laws. Any disputes arising under this Agreement shall be subject to the exclusive jurisdiction of competent courts.</p>
+
+          <div class="agreement-stamp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            This is a legally binding agreement. Your electronic signature carries full legal weight.
+          </div>
+        </div>
+
+        <form method="post" class="agreement-form">
+          {% csrf_token %}
+          <label class="agreement-checkbox-label">
+            <input type="checkbox" name="agree" value="1" required class="agreement-checkbox">
+            <span>I have read, understood, and agree to be legally bound by the terms of this Enrollment Agreement. I understand that violations may result in legal action.</span>
+          </label>
+          <button type="submit" class="btn-agree">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            I Agree — Enroll in This Course
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

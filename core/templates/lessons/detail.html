@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static edflix_tags %}
+{% block title %}{{ lesson.title }} — Edflix{% endblock %}
+
+{% block content %}
+<div class="lesson-page">
+
+  <!-- ── Sidebar ───────────────────────────────────── -->
+  <aside class="lesson-sidebar">
+    <div class="sidebar-course-title">
+      <a href="{% url 'section_courses' course.category %}" class="sidebar-back-link">
+        ← {{ course.get_category_display }}
+      </a>
+      <div class="sidebar-course-name">{{ course.title }}</div>
+    </div>
+
+    <div class="sidebar-lessons">
+      <div class="sidebar-lessons-heading">Lessons</div>
+
+      <!-- Introduction link (not a lesson) -->
+      <div class="sidebar-lesson-accordion">
+        <a href="{% url 'course_intro' course.id %}" class="sidebar-lesson-btn sidebar-intro-link">
+          <span class="sidebar-lesson-num">0</span>
+          <span class="sidebar-lesson-title">Introduction</span>
+          <svg class="sub-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </a>
+      </div>
+
+      {% for l in lessons %}
+      <div class="sidebar-lesson-accordion">
+
+        {% if l.id in accessed_lesson_ids %}
+        <button type="button"
+                class="sidebar-lesson-btn {% if l.id == lesson.id %}active-lesson{% endif %} completed"
+                onclick="toggleLesson(this, 'lesson-content-{{ l.id }}')"
+                id="lesson-btn-{{ l.id }}">
+          <span class="sidebar-lesson-num">{{ forloop.counter }}</span>
+          <span class="sidebar-lesson-title">{{ l.title }}</span>
+          <span class="sidebar-arrow {% if l.id == lesson.id %}open{% endif %}">▶</span>
+        </button>
+
+        <div class="sidebar-lesson-content {% if l.id == lesson.id %}open{% endif %}"
+             id="lesson-content-{{ l.id }}">
+
+          {% if l.video %}
+          <a href="{% url 'lesson_detail' l.id %}"
+             class="sidebar-sub-link {% if l.id == lesson.id and not request.GET.file and not request.GET.test %}active-sub{% endif %}">
+            <svg class="sub-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Video</span>
+          </a>
+          {% endif %}
+
+          {% for f in l.files.all %}
+          <a href="{% url 'download_file' f.id %}" class="sidebar-sub-link" target="_blank">
+            <svg class="sub-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+            <span>{{ f.title|truncatechars:22 }}</span>
+          </a>
+          {% endfor %}
+
+          {% if l.test %}
+          {% with score=test_results_map|get_item:l.id %}
+          <a href="{% url 'take_test' l.test.id %}" class="sidebar-sub-link">
+            <svg class="sub-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <span>{{ l.test.title|truncatechars:22 }}</span>
+            {% if score is not None %}
+            <span class="sidebar-test-score {% if score >= 70 %}score-high{% elif score >= 40 %}score-mid{% else %}score-low{% endif %}">
+              {{ score|floatformat:0 }}%
+            </span>
+            {% endif %}
+          </a>
+          {% endwith %}
+          {% endif %}
+
+        </div>
+        {% else %}
+        <!-- Locked lesson — show lock icon, clicking opens modal -->
+        <button type="button"
+                class="sidebar-lesson-btn sidebar-lesson-locked"
+                onclick="openUnlockModal('{% url 'lesson_detail' l.id %}', '{{ l.title|escapejs }}', {{ l.token_cost }})"
+                id="lesson-btn-{{ l.id }}">
+          <span class="sidebar-lesson-num">{{ forloop.counter }}</span>
+          <span class="sidebar-lesson-title">{{ l.title }}</span>
+          <svg class="sidebar-lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </button>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <!-- ── Main Content ──────────────────────────────── -->
+  <div class="lesson-main">
+    <div class="lesson-breadcrumb">
+      <a href="{% url 'section_list' %}">Tracks</a> ›
+      <a href="{% url 'section_courses' course.category %}">{{ course.get_category_display }}</a> ›
+      <span>{{ course.title }}</span>
+    </div>
+
+    <h1 class="lesson-title">{{ lesson.title }}</h1>
+    {% if lesson.description %}
+    <p class="lesson-description">{{ lesson.description }}</p>
+    {% endif %}
+
+    {% if lesson.video %}
+    <div class="video-container">
+      <video controls controlsList="nodownload" class="lesson-video" id="mainVideo">
+        <source src="{{ lesson.video.url }}">
+      </video>
+    </div>
+    {% endif %}
+
+    <!-- Star Rating -->
+    <div class="rating-section">
+      <span class="rating-label">Rate this lesson:</span>
+      <div class="star-rating" data-lesson-id="{{ lesson.id }}" data-current="{{ user_rating }}">
+        {% for i in "12345" %}
+        <button class="star {% if user_rating >= forloop.counter %}star-filled{% endif %}"
+                data-value="{{ forloop.counter }}" type="button">★</button>
+        {% endfor %}
+      </div>
+      <span class="avg-rating-display">
+        Avg: <strong id="avgRating">{% if lesson.average_rating %}{{ lesson.average_rating }}{% else %}—{% endif %}</strong>/5
+      </span>
+    </div>
+
+    {% if lesson.files.all %}
+    <div class="lesson-resources">
+      <h3 class="resources-heading">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+        Study Materials
+      </h3>
+      <div class="files-list">
+        {% for file in lesson.files.all %}
+        <a href="{% url 'download_file' file.id %}" class="file-item" target="_blank">
+          <div class="file-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          </div>
+          <div class="file-info">
+            <span class="file-name">{{ file.title }}</span>
+            <span class="file-action">Download</span>
+          </div>
+          <svg class="file-dl-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if lesson.test %}
+    <div class="lesson-test-section">
+      <h3 class="test-heading">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Practice Test
+      </h3>
+      <div class="test-card">
+        <div class="test-card-info">
+          <div class="test-name">{{ lesson.test.title }}</div>
+          {% if test_result %}
+          <div class="test-score">
+            <span class="score-label">Your score:</span>
+            <span class="score-value {% if test_result.score_percentage >= 70 %}score-good{% elif test_result.score_percentage >= 40 %}score-mid{% else %}score-low{% endif %}">
+              {{ test_result.score_percentage }}%
+            </span>
+          </div>
+          <a href="{% url 'take_test' lesson.test.id %}" class="btn-test-retake">Retake</a>
+          {% else %}
+          <div class="test-score-placeholder">Not attempted yet</div>
+          <a href="{% url 'take_test' lesson.test.id %}" class="btn-test-start">Take Test</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /lesson-main -->
+</div><!-- /lesson-page -->
+
+<!-- ── Unlock Confirmation Modal ── -->
+<div class="modal-backdrop" id="unlockModal" onclick="handleBackdropClick(event)">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+    </div>
+    <div class="modal-title">Unlock this lesson?</div>
+    <div class="modal-lesson-name" id="modalLessonName"></div>
+    <div class="modal-body">
+      This will be deducted from your token balance.
+      <div class="modal-cost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">T</text></svg>
+        <span id="modalCost">10 tokens</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeUnlockModal()">No, cancel</button>
+      <button class="modal-btn-confirm" onclick="confirmUnlock()">Yes, unlock it</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _unlockUrl = '';
+
+function openUnlockModal(url, lessonName, cost) {
+  _unlockUrl = url;
+  document.getElementById('modalLessonName').textContent = lessonName;
+  document.getElementById('modalCost').textContent = cost + ' tokens';
+  document.getElementById('unlockModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeUnlockModal() {
+  document.getElementById('unlockModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function confirmUnlock() {
+  if (_unlockUrl) window.location.href = _unlockUrl;
+}
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('unlockModal')) closeUnlockModal();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeUnlockModal();
+});
+
+function toggleLesson(btn, contentId) {
+  const content = document.getElementById(contentId);
+  const arrow = btn.querySelector('.sidebar-arrow');
+  const isOpen = content.classList.contains('open');
+  document.querySelectorAll('.sidebar-lesson-content').forEach(c => c.classList.remove('open'));
+  document.querySelectorAll('.sidebar-arrow').forEach(a => a.classList.remove('open'));
+  if (!isOpen) {
+    content.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+
+document.querySelectorAll('.star').forEach(star => {
+  star.addEventListener('mouseenter', function() {
+    const val = parseInt(this.dataset.value);
+    document.querySelectorAll('.star').forEach((s, i) => {
+      s.classList.toggle('star-filled', i < val);
+    });
+  });
+  star.addEventListener('mouseleave', function() {
+    const current = parseInt(document.querySelector('.star-rating').dataset.current) || 0;
+    document.querySelectorAll('.star').forEach((s, i) => {
+      s.classList.toggle('star-filled', i < current);
+    });
+  });
+  star.addEventListener('click', function() {
+    const val = parseInt(this.dataset.value);
+    fetch('{% url "rate_lesson" lesson.id %}', {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'rating=' + val,
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        document.querySelector('.star-rating').dataset.current = val;
+        document.getElementById('avgRating').textContent = data.avg_rating || '—';
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

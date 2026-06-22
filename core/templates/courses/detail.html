@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ course.title }} — Edflix{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
+{% block content %}
+<div class="course-detail-page">
+
+  <div class="course-detail-hero">
+    <div class="course-detail-hero-content animate-on-scroll">
+      <div class="breadcrumb" style="margin-bottom:14px;font-size:0.82rem;">
+        <a href="{% url 'section_list' %}">Courses</a>
+        <span style="margin:0 6px;color:var(--text-muted);">›</span>
+        <span>{{ course.get_category_display }}</span>
+      </div>
+      <h1>{{ course.title }}</h1>
+      <p>{{ course.description }}</p>
+      <div class="course-detail-meta" style="margin-top:16px;">
+        <span>{{ lessons.count }} lessons</span>
+        <span>·</span>
+        <span>{% if course.average_rating %}{{ course.average_rating }}/5 avg rating{% else %}No ratings yet{% endif %}</span>
+        <span>·</span>
+        <span>5 tokens per lesson</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="course-detail-body">
+    <div class="lessons-list-wrap animate-on-scroll">
+      <h2 class="lessons-list-title">Course Lessons</h2>
+      {% if lessons %}
+      <div class="lessons-list stagger-children">
+        {% for lesson in lessons %}
+        <div class="lesson-row {% if lesson.id in accessed_lesson_ids %}lesson-unlocked{% else %}lesson-locked{% endif %}" style="--i:{{ forloop.counter0 }}">
+          <div class="lesson-num">{{ forloop.counter }}</div>
+          <div class="lesson-row-info">
+            <div class="lesson-row-title">{{ lesson.title }}</div>
+            {% if lesson.description %}
+            <div class="lesson-row-desc">{{ lesson.description|truncatewords:15 }}</div>
+            {% endif %}
+            <div class="lesson-row-meta">
+              {% if lesson.video %}<span class="meta-tag">Video</span>{% endif %}
+              {% if lesson.files.count > 0 %}<span class="meta-tag">{{ lesson.files.count }} file{{ lesson.files.count|pluralize }}</span>{% endif %}
+              {% if lesson.test %}<span class="meta-tag test-tag">Test</span>{% endif %}
+            </div>
+          </div>
+          <div class="lesson-row-right">
+            {% if lesson.id in accessed_lesson_ids %}
+            <span class="unlocked-badge">Unlocked</span>
+            <a href="{% url 'lesson_detail' lesson.id %}" class="btn-lesson-go">Continue →</a>
+            {% else %}
+            <svg class="lock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <span class="token-cost-badge">{{ lesson.token_cost }} tokens</span>
+            <button type="button" class="btn-lesson-unlock"
+              onclick="openUnlockModal('{% url 'lesson_detail' lesson.id %}', '{{ lesson.title|escapejs }}', {{ lesson.token_cost }})">
+              Unlock
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:64px 0;">
+        <p style="color:var(--text-muted);font-size:0.9rem;">No lessons have been added yet. Check back soon.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="course-detail-sidebar animate-on-scroll">
+      <div class="sidebar-card">
+        <div class="sidebar-token-info">
+          <div class="your-tokens">Your tokens: <strong>{{ current_user.tokens }}</strong></div>
+          {% if current_user.tokens < 5 %}
+          <div class="tokens-low-warn" style="margin-top:8px;margin-bottom:12px;">You're running low on tokens.</div>
+          <a href="{% url 'buy_tokens' %}" class="btn-buy-tokens-side">Buy Tokens</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="sidebar-card sidebar-info-card" style="margin-top:12px;">
+        <h4>What's included</h4>
+        <ul class="sidebar-features" style="margin-top:14px;">
+          <li>✓ HD video lessons</li>
+          <li>✓ Downloadable materials</li>
+          <li>✓ Multiple-choice tests</li>
+          <li>✓ Lesson ratings</li>
+          <li>✓ Lifetime access</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Unlock Confirmation Modal ── -->
+<div class="modal-backdrop" id="unlockModal" onclick="handleBackdropClick(event)">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+    </div>
+    <div class="modal-title">Unlock this lesson?</div>
+    <div class="modal-lesson-name" id="modalLessonName"></div>
+    <div class="modal-body">
+      This will be deducted from your token balance.
+      <div class="modal-cost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">T</text></svg>
+        <span id="modalCost">10 tokens</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeUnlockModal()">No, cancel</button>
+      <button class="modal-btn-confirm" id="modalConfirmBtn" onclick="confirmUnlock()">Yes, unlock it</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _unlockUrl = '';
+var userTokens = {{ current_user.tokens }};
+
+function openUnlockModal(url, lessonName, cost) {
+  if (userTokens === 0) {
+    window.location.href = "{% url 'buy_tokens' %}";
+    return;
+  }
+  _unlockUrl = url;
+  document.getElementById('modalLessonName').textContent = lessonName;
+  document.getElementById('modalCost').textContent = cost + ' tokens';
+  document.getElementById('unlockModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeUnlockModal() {
+  document.getElementById('unlockModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function confirmUnlock() {
+  if (_unlockUrl) window.location.href = _unlockUrl;
+}
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('unlockModal')) closeUnlockModal();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeUnlockModal();
+});
+</script>
+{% endblock %}

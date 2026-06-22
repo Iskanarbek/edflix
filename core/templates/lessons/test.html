@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ test.title }} — Edflix{% endblock %}
+{% block content %}
+<div class="test-page">
+  <a href="{% url 'lesson_detail' lesson.id %}" class="back-link" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;font-size:0.85rem;color:var(--text-dim);">← Back to lesson</a>
+  <h1>{{ test.title }}</h1>
+  <p class="test-intro">Answer all questions and submit to see your score immediately.</p>
+
+  {% if existing_result %}
+  <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:6px;margin-bottom:24px;
+       {% if existing_result.score_percentage >= 70 %}background:#0d2e1a;border:1px solid #22c55e44;color:#22c55e;
+       {% elif existing_result.score_percentage >= 40 %}background:#2e1f00;border:1px solid #f0b42944;color:#f0b429;
+       {% else %}background:#2e0d0d;border:1px solid #ef444444;color:#ef4444;{% endif %}
+       font-size:0.88rem;font-weight:600;">
+    Previous score: {{ existing_result.score_percentage }}%
+  </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    {% for question in questions %}
+    <div class="question-block">
+      <div class="question-text">{{ forloop.counter }}. {{ question.question_text }}</div>
+      {% for answer in question.answers.all %}
+      <label class="answer-option">
+        <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}" required>
+        <span>{{ answer.answer_text }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    {% empty %}
+    <div style="color:var(--text-muted);padding:32px 0;">This test has no questions yet.</div>
+    {% endfor %}
+
+    {% if questions %}
+    <button type="submit" class="btn-submit-test">Submit Answers →</button>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}

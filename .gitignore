@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.pyc
+
+# Virtual environment
+venv/
+env/
+.env
+
+# Django
+media/
+local_settings.py
+staticfiles/
+staticfiles_build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docs / plans (internal)
+docs/superpowers/
+
+# Claude Code internal
+.claude/

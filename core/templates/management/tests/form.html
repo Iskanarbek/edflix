@@ -1,0 +1,73 @@
+{% extends 'management/base.html' %}
+{% block title %}{{ action }} Test — Edflix Admin{% endblock %}
+{% block nav_courses %}active{% endblock %}
+{% block page_title %}{{ action }} Test{% endblock %}
+{% block content %}
+<div class="mgmt-form-wrap">
+  <div class="mgmt-form-card">
+    <div class="mgmt-form-header">
+      <a href="{% url 'mgmt_lesson_list' lesson.course.id %}" class="back-link">← Back to Lessons</a>
+      <h2>{{ action }} Test for: <span class="form-course-name">{{ lesson.title }}</span></h2>
+    </div>
+    <form method="post" class="mgmt-form" id="testForm">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Test Title *</label>
+        <input type="text" name="title" class="form-input" value="{{ test.title|default:'' }}" placeholder="e.g. IELTS Listening Practice Test 1" required>
+      </div>
+
+      <div class="questions-section">
+        <div class="questions-header">
+          <h3>Questions</h3>
+          <button type="button" class="btn-add-question" onclick="addQuestion()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Question
+          </button>
+        </div>
+
+        <div id="questionsContainer">
+          {% if test %}
+            {% for question in test.questions.all %}
+            <div class="question-builder" data-index="{{ forloop.counter0 }}">
+              <div class="question-builder-header">
+                <span class="question-builder-num">Question {{ forloop.counter }}</span>
+                <button type="button" class="btn-remove-question" onclick="removeQuestion(this)">Remove</button>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Question Text *</label>
+                <textarea name="question_text" class="form-input form-textarea form-textarea-sm" placeholder="Enter your question here..." required>{{ question.question_text }}</textarea>
+              </div>
+              <div class="answers-builder">
+                <label class="form-label">Answer Options (mark the correct one)</label>
+                {% for answer in question.answers.all %}
+                <div class="answer-builder-row">
+                  <input type="radio" name="correct_{{ forloop.parentloop.counter0 }}" value="{{ forloop.counter0 }}"
+                    {% if answer.is_correct %}checked{% endif %} class="answer-correct-radio" title="Mark as correct">
+                  <input type="text" name="answer_{{ forloop.parentloop.counter0 }}" class="form-input answer-input"
+                    value="{{ answer.answer_text }}" placeholder="Answer option {{ forloop.counter }}">
+                </div>
+                {% endfor %}
+                {% for i in "45" %}{% if forloop.counter > question.answers.count %}
+                <div class="answer-builder-row">
+                  <input type="radio" name="correct_{{ forloop.parentloop.counter0 }}" value="{{ forloop.counter0 }}" class="answer-correct-radio">
+                  <input type="text" name="answer_{{ forloop.parentloop.counter0 }}" class="form-input answer-input" placeholder="Answer option {{ forloop.counter }}">
+                </div>
+                {% endif %}{% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-mgmt-primary">{{ action }} Test</button>
+        <a href="{% url 'mgmt_lesson_list' lesson.course.id %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/management.js' %}"></script>
+{% endblock %}

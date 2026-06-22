@@ -1,0 +1,87 @@
+{% extends 'teacher/base.html' %}
+{% block title %}{{ course.title }} — Teacher Panel{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+  <a href="{% url 'teacher_dashboard' %}" class="panel-back-link">← Dashboard</a>
+  <div style="flex:1;">
+    <h1 class="panel-page-title">{{ course.title }}</h1>
+    <p class="panel-page-sub">{{ course.get_category_display }} · {{ lessons|length }} lesson{{ lessons|length|pluralize }}</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'teacher_lesson_create' course.id %}" class="btn-panel-primary">+ Add Lesson</a>
+    <a href="{% url 'teacher_course_edit' course.id %}" class="btn-panel-ghost">Edit Course</a>
+  </div>
+</div>
+
+{% if lessons %}
+<div style="display:flex;flex-direction:column;gap:12px;">
+  {% for lesson in lessons %}
+  <div class="teacher-lesson-card">
+    <div class="teacher-lesson-inner">
+      <div class="lesson-row-num">{{ forloop.counter }}</div>
+      <div class="teacher-lesson-content">
+        <div class="teacher-lesson-title">{{ lesson.title }}</div>
+        {% if lesson.description %}
+        <div class="teacher-lesson-desc">{{ lesson.description|truncatewords:20 }}</div>
+        {% endif %}
+        <div class="teacher-lesson-tags">
+          {% if lesson.video %}
+          <span class="lesson-meta-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            Video
+          </span>
+          {% endif %}
+          {% if lesson.files.all %}
+          <span class="lesson-meta-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+            {{ lesson.files.count }} file{{ lesson.files.count|pluralize }}
+          </span>
+          {% endif %}
+          {% if lesson.test %}
+          <span class="lesson-meta-tag" style="color:var(--panel-green);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
+            Test: {{ lesson.test.title }}
+          </span>
+          {% endif %}
+          <span class="lesson-meta-tag teacher-token-pill">{{ lesson.token_cost }} tokens</span>
+        </div>
+        {% if lesson.files.all %}
+        <div class="teacher-files-list">
+          {% for f in lesson.files.all %}
+          <div class="teacher-file-row {% if not forloop.last %}teacher-file-row-sep{% endif %}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity="0.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+            <span class="teacher-file-name">{{ f.title }}</span>
+            <form method="post" action="{% url 'teacher_file_delete' f.id %}" onsubmit="return confirm('Delete file?');" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="teacher-file-del">✕</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="teacher-lesson-actions">
+        <a href="{% url 'teacher_lesson_edit' lesson.id %}" class="btn-panel-ghost" style="padding:6px 14px;font-size:0.8rem;">Edit</a>
+        {% if lesson.test %}
+        <a href="{% url 'teacher_test_edit' lesson.test.id %}" class="btn-panel-ghost" style="padding:6px 14px;font-size:0.8rem;">Edit Test</a>
+        {% else %}
+        <a href="{% url 'teacher_test_create' lesson.id %}" class="btn-panel-ghost" style="padding:6px 14px;font-size:0.8rem;color:#E75E24;border-color:rgba(231,94,36,0.3);">+ Test</a>
+        {% endif %}
+        <a href="{% url 'teacher_lesson_delete' lesson.id %}" class="btn-danger" style="padding:6px 14px;font-size:0.8rem;">Delete</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="panel-empty-state">
+  <div class="panel-empty-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+  </div>
+  <h3 class="panel-empty-title">No lessons yet</h3>
+  <p class="panel-empty-sub">Add your first lesson to this course.</p>
+  <a href="{% url 'teacher_lesson_create' course.id %}" class="btn-panel-primary">Add First Lesson</a>
+</div>
+{% endif %}
+{% endblock %}

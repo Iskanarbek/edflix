@@ -1,0 +1,63 @@
+{% extends 'teacher/base.html' %}
+{% block title %}Dashboard — Teacher Panel{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="panel-header">
+  <h1 class="panel-page-title">My Courses</h1>
+  <p class="panel-page-sub">Manage your courses, lessons, and content</p>
+</div>
+
+<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:28px;">
+  <div class="stat-card">
+    <div class="stat-label">Total Courses</div>
+    <div class="stat-value">{{ total_courses }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Lessons</div>
+    <div class="stat-value">{{ total_lessons }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Earned</div>
+    <div class="stat-value green">+${{ total_usd }}</div>
+    <div class="stat-sub">{{ total_tokens }} tokens</div>
+  </div>
+</div>
+
+{% if courses %}
+<div class="teacher-courses-grid">
+  {% for course in courses %}
+  <div class="teacher-course-card">
+    {% if course.thumbnail %}
+    <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="teacher-course-thumb">
+    {% else %}
+    <div class="teacher-course-thumb-placeholder">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.25"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    </div>
+    {% endif %}
+    <div class="teacher-course-body">
+      <div class="teacher-course-meta">
+        <span class="teacher-course-category">{{ course.get_category_display }}</span>
+        <span class="teacher-course-lessons">{{ course.lesson_count }} lesson{{ course.lesson_count|pluralize }}</span>
+      </div>
+      <h3 class="teacher-course-title">{{ course.title }}</h3>
+      <div class="panel-actions" style="margin-top:0;">
+        <a href="{% url 'teacher_course_detail' course.id %}" class="btn-panel-primary" style="padding:7px 14px;font-size:0.82rem;">Manage</a>
+        <a href="{% url 'teacher_course_edit' course.id %}" class="btn-panel-ghost" style="padding:7px 14px;font-size:0.82rem;">Edit</a>
+        <a href="{% url 'teacher_course_delete' course.id %}" class="btn-danger" style="padding:7px 14px;font-size:0.82rem;">Delete</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="panel-empty-state">
+  <div class="panel-empty-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+  </div>
+  <h3 class="panel-empty-title">No courses yet</h3>
+  <p class="panel-empty-sub">Create your first course to start teaching.</p>
+  <a href="{% url 'teacher_course_create' %}" class="btn-panel-primary">Create First Course</a>
+</div>
+{% endif %}
+{% endblock %}

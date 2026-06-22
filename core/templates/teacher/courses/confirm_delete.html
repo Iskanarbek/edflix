@@ -1,0 +1,19 @@
+{% extends 'teacher/base.html' %}
+{% block title %}Delete Course — Teacher Panel{% endblock %}
+
+{% block content %}
+<div style="max-width:480px;margin:60px auto;text-align:center;">
+  <div style="width:56px;height:56px;background:#2e0d0d;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+  </div>
+  <h2 style="color:#fff;font-size:1.4rem;font-weight:800;margin-bottom:10px;">Delete "{{ course.title }}"?</h2>
+  <p style="color:#7a6040;font-size:0.9rem;margin-bottom:28px;">This will permanently delete the course and all its lessons, files, and tests. This cannot be undone.</p>
+  <div style="display:flex;gap:12px;justify-content:center;">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-danger" style="padding:11px 24px;font-size:0.9rem;">Yes, Delete</button>
+    </form>
+    <a href="{% url 'teacher_dashboard' %}" class="btn-panel-ghost" style="padding:11px 22px;font-size:0.9rem;">Cancel</a>
+  </div>
+</div>
+{% endblock %}

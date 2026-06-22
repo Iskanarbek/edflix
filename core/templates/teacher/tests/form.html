@@ -1,0 +1,138 @@
+{% extends 'teacher/base.html' %}
+{% block title %}{{ action }} Test — Teacher Panel{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+  <a href="{% url 'teacher_course_detail' lesson.course.id %}" style="color:#7a6040;font-size:0.85rem;">← {{ lesson.course.title }}</a>
+  <span style="color:#2a2a2a;">›</span>
+  <span style="color:#5a5040;font-size:0.85rem;">{{ lesson.title }}</span>
+</div>
+
+<div class="panel-header">
+  <h1 class="panel-page-title">{{ action }} Test</h1>
+  <p class="panel-page-sub">Build a multiple-choice quiz for this lesson</p>
+</div>
+
+<div style="max-width:720px;">
+  <form method="post" id="testForm" class="panel-form">
+    {% csrf_token %}
+
+    <div class="panel-field">
+      <label class="panel-label">Test Title</label>
+      <input type="text" name="title" class="panel-input" value="{{ test.title|default:'' }}"
+             placeholder="e.g. Lesson 1 Comprehension Check" required>
+    </div>
+
+    <div style="margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 style="font-size:0.88rem;font-weight:700;color:#a09070;text-transform:uppercase;letter-spacing:.05em;">Questions</h3>
+        <button type="button" id="addQuestion" class="btn-add-question" style="width:auto;padding:8px 18px;">
+          + Add Question
+        </button>
+      </div>
+
+      <div id="questionBuilder" class="question-builder">
+        {% if test %}
+          {% for question in test.questions.all %}
+          <div class="question-card" data-q="{{ forloop.counter0 }}">
+            <button type="button" class="btn-remove-question" onclick="removeQuestion(this)">✕</button>
+            <div class="question-num">Question {{ forloop.counter }}</div>
+            <div class="panel-field" style="margin-bottom:12px;">
+              <input type="text" name="question_text" class="panel-input"
+                     value="{{ question.question_text }}" placeholder="Enter question…" required>
+            </div>
+            <div class="answers-wrap">
+              {% for answer in question.answers.all %}
+              <div class="answer-row">
+                <input type="radio" name="correct_{{ forloop.parentloop.counter0 }}"
+                       value="{{ forloop.counter0 }}"
+                       {% if answer.is_correct %}checked{% endif %}>
+                <input type="text" name="answer_{{ forloop.parentloop.counter0 }}"
+                       value="{{ answer.answer_text }}" placeholder="Answer option…">
+              </div>
+              {% endfor %}
+              {% if question.answers.count < 4 %}
+              <button type="button" class="btn-add-answer" onclick="addAnswer(this, {{ forloop.counter0 }})">+ Add option</button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div id="noQuestionsMsg" style="text-align:center;padding:40px;color:#5a5040;font-size:0.88rem;{% if test and test.questions.count > 0 %}display:none;{% endif %}">
+        No questions yet — click "Add Question" to start building the test.
+      </div>
+    </div>
+
+    {% if test %}
+    <div style="margin-top:12px;padding-top:16px;border-top:1px solid #1a1a1a;">
+      <a href="{% url 'teacher_test_delete' test.id %}"
+         onclick="return confirm('Delete this test and all its questions?');"
+         class="btn-danger" style="font-size:0.82rem;padding:7px 14px;">Delete Test</a>
+    </div>
+    {% endif %}
+
+    <div class="panel-actions" style="margin-top:24px;">
+      <button type="submit" class="btn-panel-primary">Save Test</button>
+      <a href="{% url 'teacher_course_detail' lesson.course.id %}" class="btn-panel-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+let qCount = {{ test.questions.count|default:0 }};
+
+function updateNoMsg() {
+  const cards = document.querySelectorAll('.question-card');
+  document.getElementById('noQuestionsMsg').style.display = cards.length === 0 ? 'block' : 'none';
+}
+
+document.getElementById('addQuestion').addEventListener('click', function() {
+  const idx = qCount++;
+  const card = document.createElement('div');
+  card.className = 'question-card';
+  card.dataset.q = idx;
+  card.innerHTML = `
+    <button type="button" class="btn-remove-question" onclick="removeQuestion(this)">✕</button>
+    <div class="question-num">Question ${document.querySelectorAll('.question-card').length + 1}</div>
+    <div class="panel-field" style="margin-bottom:12px;">
+      <input type="text" name="question_text" class="panel-input" placeholder="Enter question…" required>
+    </div>
+    <div class="answers-wrap">
+      <div class="answer-row">
+        <input type="radio" name="correct_${idx}" value="0" checked>
+        <input type="text" name="answer_${idx}" placeholder="Option A…">
+      </div>
+      <div class="answer-row">
+        <input type="radio" name="correct_${idx}" value="1">
+        <input type="text" name="answer_${idx}" placeholder="Option B…">
+      </div>
+      <button type="button" class="btn-add-answer" onclick="addAnswer(this, ${idx})">+ Add option</button>
+    </div>`;
+  document.getElementById('questionBuilder').appendChild(card);
+  updateNoMsg();
+});
+
+function removeQuestion(btn) {
+  btn.closest('.question-card').remove();
+  updateNoMsg();
+}
+
+function addAnswer(btn, idx) {
+  const wrap = btn.closest('.answers-wrap');
+  const rows = wrap.querySelectorAll('.answer-row');
+  if (rows.length >= 4) { btn.remove(); return; }
+  const row = document.createElement('div');
+  row.className = 'answer-row';
+  const labels = ['A','B','C','D'];
+  row.innerHTML = `
+    <input type="radio" name="correct_${idx}" value="${rows.length}">
+    <input type="text" name="answer_${idx}" placeholder="Option ${labels[rows.length]}…">`;
+  wrap.insertBefore(row, btn);
+  if (rows.length + 1 >= 4) btn.remove();
+}
+
+updateNoMsg();
+</script>
+{% endblock %}

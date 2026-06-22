@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ section.label }} Courses — Edflix{% endblock %}
+{% block content %}
+<div class="container courses-page">
+  <a href="{% url 'section_list' %}" class="back-link">← All Tracks</a>
+
+  <div class="animate-on-scroll">
+    <div class="section-tag">{{ section.short }}</div>
+    <h1 class="section-title">{{ section.label }}</h1>
+    <p class="section-subtitle">{{ section.description }}</p>
+  </div>
+
+  {% if courses %}
+  <div class="courses-grid stagger-children animate-on-scroll">
+    {% for course in courses %}
+    <div class="course-card" style="--i:{{ forloop.counter0 }}">
+      {% if course.thumbnail %}
+      <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="course-thumb" loading="lazy">
+      {% else %}
+      <div class="course-thumb-placeholder">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,55,0.25)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      {% endif %}
+      <div class="course-body">
+        <div class="course-meta">
+          <span class="course-cat">{{ course.get_category_display }}</span>
+          {% if course.average_rating %}
+          <span class="course-rating">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            {{ course.average_rating }}
+          </span>
+          {% endif %}
+        </div>
+        <h3 class="course-title">{{ course.title }}</h3>
+        {% if course.teacher %}
+        <div class="course-teacher">by {{ course.teacher.name }}</div>
+        {% endif %}
+        <p class="course-desc">{{ course.description|truncatewords:20 }}</p>
+        <div class="course-footer">
+          <span class="course-lessons">{{ course.lesson_count }} lesson{{ course.lesson_count|pluralize }}</span>
+          <a href="{% url 'course_detail' course.id %}" class="btn-view-course">View Course</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="animate-on-scroll" style="text-align:center;padding:96px 0;">
+    <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:24px;">No courses in this track yet. Check back soon.</p>
+    <a href="{% url 'section_list' %}" class="btn-ghost">← Back to Tracks</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

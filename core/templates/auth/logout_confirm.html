@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Sign Out — Edflix{% endblock %}
+{% block content %}
+<div class="logout-page">
+  <div style="width:52px;height:52px;background:#181818;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a09070" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  </div>
+  <h1>Sign out of Edflix?</h1>
+  <p>You'll need to sign in again to access your courses and progress.</p>
+  <div class="logout-actions">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-confirm-logout">Yes, Sign Out</button>
+    </form>
+    <a href="{% url 'section_list' %}" class="btn-cancel">Cancel</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ teacher.name }} — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/management.css' %}">
+</head>
+<body>
+<div class="panel-wrap">
+  <aside class="panel-sidebar">
+    <div class="panel-logo">
+      <span class="logo-ed">Ed</span><span class="logo-flix">flix</span>
+      <span class="panel-logo-tag">Admin</span>
+    </div>
+    <nav class="panel-nav">
+      <a href="{% url 'management_dashboard' %}" class="panel-nav-link">
+        <svg class="panel-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+    </nav>
+    <div class="panel-footer">
+      <a href="{% url 'management_logout' %}" class="panel-logout">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </a>
+    </div>
+  </aside>
+
+  <main class="panel-main">
+    <a href="{% url 'management_dashboard' %}" class="panel-back-link" style="margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;">← All teachers</a>
+
+    <!-- Teacher header -->
+    <div class="teacher-profile-card">
+      <div class="teacher-avatar" style="width:52px;height:52px;font-size:1.3rem;">{{ teacher.name|first|upper }}</div>
+      <div style="flex:1;">
+        <div class="teacher-name" style="font-size:1.1rem;">{{ teacher.name }}</div>
+        <div class="teacher-email">{{ teacher.email }}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:4px;">Total Earned</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--panel-green);">+${{ teacher.earned_usd }}</div>
+        <div style="font-size:0.78rem;color:#9CA3AF;">{{ teacher.tokens_earned }} tokens</div>
+      </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages-container" style="margin-bottom:16px;">
+      {% for msg in messages %}
+      <div class="message {% if msg.tags == 'success' %}success{% else %}error{% endif %}">
+        <span>{{ msg }}</span>
+        <button class="message-close" onclick="this.parentElement.remove()">✕</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="panel-section-label">Courses ({{ courses|length }})</div>
+
+    {% if courses %}
+    {% for course in courses %}
+    <div class="course-block">
+      <div class="course-block-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="teacher-course-category">{{ course.get_category_display }}</span>
+          <span class="course-block-title">{{ course.title }}</span>
+        </div>
+        <a href="{% url 'admin_delete_course' course.id %}" class="btn-danger" style="font-size:0.78rem;padding:5px 12px;">Delete Course</a>
+      </div>
+      {% for lesson in course.lessons.all %}
+      <div class="lesson-row">
+        <div class="lesson-row-num">{{ forloop.counter }}</div>
+        <div class="lesson-row-title">{{ lesson.title }}</div>
+        <div class="lesson-row-meta">
+          {% if lesson.video %}<span class="lesson-meta-tag">Video</span>{% endif %}
+          {% if lesson.files.count %}<span class="lesson-meta-tag">{{ lesson.files.count }} file{{ lesson.files.count|pluralize }}</span>{% endif %}
+          {% if lesson.test %}<span class="lesson-meta-tag" style="color:var(--panel-green);">✓ Test</span>{% endif %}
+          <span class="lesson-meta-tag">{{ lesson.accesses.count }} views</span>
+          <a href="{% url 'admin_delete_lesson' lesson.id %}" class="btn-danger" style="font-size:0.75rem;padding:4px 10px;">Delete</a>
+        </div>
+      </div>
+      {% empty %}
+      <div style="padding:16px 22px;color:#9CA3AF;font-size:0.85rem;">No lessons yet.</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="panel-empty-state">
+      <p class="panel-empty-sub">This teacher has no courses yet.</p>
+    </div>
+    {% endif %}
+  </main>
+</div>
+</body>
+</html>

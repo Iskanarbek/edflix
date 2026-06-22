@@ -1,0 +1,60 @@
+{% extends 'management/base.html' %}
+{% block title %}{{ action }} Course — Edflix Admin{% endblock %}
+{% block nav_courses %}active{% endblock %}
+{% block page_title %}{{ action }} Course{% endblock %}
+{% block content %}
+<div class="mgmt-form-wrap">
+  <div class="mgmt-form-card">
+    <div class="mgmt-form-header">
+      <a href="{% url 'mgmt_course_list' %}" class="back-link">← Back to Courses</a>
+      <h2>{{ action }} Course</h2>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="mgmt-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Course Title *</label>
+        <input type="text" name="title" class="form-input" value="{{ course.title|default:'' }}" placeholder="e.g. IELTS Complete Preparation" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea name="description" class="form-input form-textarea" placeholder="Describe what students will learn..." required>{{ course.description|default:'' }}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select name="category" class="form-input form-select" required>
+            {% for val, label in category_choices %}
+            <option value="{{ val }}" {% if course.category == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teacher Email</label>
+          <input type="email" name="teacher_email" class="form-input" value="{{ course.teacher_email|default:'' }}" placeholder="teacher@example.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preview Photo (thumbnail)</label>
+        {% if course.thumbnail %}
+        <div class="current-file">Current: <a href="{{ course.thumbnail.url }}" target="_blank">View photo</a></div>
+        {% endif %}
+        <input type="file" name="thumbnail" class="form-input form-file" accept="image/*">
+        <span class="form-hint">Shown on the course card. Recommended: 16:9 ratio.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Intro Video <span class="form-label-note">(Lesson 0 — shown before agreement)</span></label>
+        {% if course.intro_video %}
+        <div class="current-file">Current: <a href="{{ course.intro_video.url }}" target="_blank">View video</a></div>
+        {% endif %}
+        <input type="file" name="intro_video" class="form-input form-file" accept="video/*">
+        <span class="form-hint">This video appears on the introduction & agreement page.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-mgmt-primary">{{ action }} Course</button>
+        <a href="{% url 'mgmt_course_list' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Buy Tokens — Edflix{% endblock %}
+{% block content %}
+<div class="tokens-page">
+  <h1>Get Learning Tokens</h1>
+  <p class="subtitle">
+    Tokens unlock lessons. Your current balance:
+    <strong style="color:var(--gold);">{{ current_user.tokens }} tokens</strong>.
+    Each lesson costs <strong>3 tokens</strong> · 1 token = $0.50 · Valid for 30 days
+  </p>
+
+  <div class="plans-grid">
+    {% for plan in plans %}
+    <div class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
+      {% if forloop.counter == 2 %}<div class="plan-badge">Best Value</div>{% endif %}
+      <div class="plan-name">{{ plan.name }}</div>
+      <div class="plan-price"><sup>$</sup>{{ plan.price_usd }}</div>
+      <div class="plan-tokens">{{ plan.tokens }} tokens</div>
+      <div class="plan-expiry">Valid for 30 days · unlocks {% widthratio plan.tokens 3 1 %} lessons</div>
+      <a href="{% url 'initiate_purchase' plan.id %}" class="btn-plan">
+        Buy {{ plan.tokens }} Tokens
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="max-width:680px;margin:40px auto 0;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border);font-size:0.82rem;font-weight:700;color:var(--white);letter-spacing:0.04em;text-transform:uppercase;">How tokens work</div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="color:var(--gold);font-size:1rem;line-height:1;margin-top:1px;flex-shrink:0;">●</span>
+        <span style="color:var(--text-dim);font-size:0.87rem;line-height:1.6;">Each lesson costs <strong style="color:var(--text);">3 tokens</strong> — unlock it once and access it forever.</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="color:var(--gold);font-size:1rem;line-height:1;margin-top:1px;flex-shrink:0;">●</span>
+        <span style="color:var(--text-dim);font-size:0.87rem;line-height:1.6;">Tokens expire <strong style="color:var(--text);">30 days</strong> after purchase — use them before the deadline.</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="color:var(--gold);font-size:1rem;line-height:1;margin-top:1px;flex-shrink:0;">●</span>
+        <span style="color:var(--text-dim);font-size:0.87rem;line-height:1.6;">Tokens work across <strong style="color:var(--text);">all courses</strong> on Edflix — buy once, use anywhere.</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="color:var(--gold);font-size:1rem;line-height:1;margin-top:1px;flex-shrink:0;">●</span>
+        <span style="color:var(--text-dim);font-size:0.87rem;line-height:1.6;">Payment is processed securely through <strong style="color:var(--text);">Payme</strong>.</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

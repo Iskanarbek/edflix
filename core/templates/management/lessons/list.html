@@ -1,0 +1,71 @@
+{% extends 'management/base.html' %}
+{% block title %}Lessons — {{ course.title }} — Edflix Admin{% endblock %}
+{% block nav_courses %}active{% endblock %}
+{% block page_title %}Lessons: {{ course.title }}{% endblock %}
+{% block content %}
+<div class="mgmt-section">
+  <div class="mgmt-section-header">
+    <div>
+      <a href="{% url 'mgmt_course_list' %}" class="back-link">← All Courses</a>
+      <h2>{{ course.title }}</h2>
+      <span class="category-pill category-{{ course.category }}">{{ course.get_category_display }}</span>
+    </div>
+    <a href="{% url 'mgmt_lesson_create' course.id %}" class="btn-mgmt-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Lesson
+    </a>
+  </div>
+
+  {% if lessons %}
+  <div class="lessons-mgmt-list">
+    {% for lesson in lessons %}
+    <div class="lesson-mgmt-card">
+      <div class="lesson-mgmt-order">{{ lesson.order }}</div>
+      <div class="lesson-mgmt-info">
+        <div class="lesson-mgmt-title">{{ lesson.title }}</div>
+        {% if lesson.description %}
+        <div class="lesson-mgmt-desc">{{ lesson.description|truncatechars:80 }}</div>
+        {% endif %}
+        <div class="lesson-mgmt-tags">
+          {% if lesson.video %}<span class="meta-tag">Video</span>{% endif %}
+          <span class="meta-tag">{{ lesson.token_cost }} tokens</span>
+          {% if lesson.files.count > 0 %}
+          <span class="meta-tag">{{ lesson.files.count }} file{{ lesson.files.count|pluralize }}</span>
+          {% endif %}
+          {% if lesson.test %}<span class="meta-tag test-tag">Has Test</span>{% endif %}
+        </div>
+
+        {% if lesson.files.all %}
+        <div class="lesson-files-list">
+          <div class="files-subheading">Attached files:</div>
+          {% for f in lesson.files.all %}
+          <div class="lesson-file-row">
+            <span class="lesson-file-name">{{ f.title }}</span>
+            <form method="post" action="{% url 'mgmt_file_delete' f.id %}" style="display:inline" onsubmit="return confirm('Delete this file?')">
+              {% csrf_token %}
+              <button type="submit" class="btn-action btn-delete btn-sm">Remove</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="lesson-mgmt-actions">
+        {% if lesson.test %}
+        <a href="{% url 'mgmt_test_edit' lesson.test.id %}" class="btn-action btn-view">Edit Test</a>
+        {% else %}
+        <a href="{% url 'mgmt_test_create' lesson.id %}" class="btn-action btn-view">Add Test</a>
+        {% endif %}
+        <a href="{% url 'mgmt_lesson_edit' lesson.id %}" class="btn-action btn-edit">Edit</a>
+        <a href="{% url 'mgmt_lesson_delete' lesson.id %}" class="btn-action btn-delete">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="mgmt-empty">
+    <p>No lessons yet. <a href="{% url 'mgmt_lesson_create' course.id %}">Add the first lesson →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

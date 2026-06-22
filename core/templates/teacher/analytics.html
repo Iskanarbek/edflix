@@ -1,0 +1,73 @@
+{% extends 'teacher/base.html' %}
+{% block title %}Analytics — Teacher Panel{% endblock %}
+{% block nav_analytics %}active{% endblock %}
+
+{% block content %}
+<div class="panel-header">
+  <h1 class="panel-page-title">Analytics</h1>
+  <p class="panel-page-sub">Earnings and performance across all your courses</p>
+</div>
+
+<!-- Total banner -->
+<div class="analytics-banner">
+  <div class="analytics-banner-left">
+    <h2>Total Earned (all time)</h2>
+    <div class="analytics-banner-amount">+${{ total_usd }}</div>
+    <div class="analytics-banner-sub">{{ total_tokens }} tokens · 25% platform fee already deducted</div>
+  </div>
+  <div style="text-align:center;">
+    <button onclick="document.getElementById('withdrawModal').style.display='flex'" class="btn-withdraw">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Withdraw Funds
+    </button>
+    {% if not teacher.has_card %}
+    <div class="no-card-warning"><a href="{% url 'teacher_connect_card' %}">Connect your card</a> to receive money</div>
+    {% endif %}
+  </div>
+</div>
+
+{% if course_data %}
+{% for cd in course_data %}
+<div class="analytics-course-block">
+  <div class="analytics-course-header">
+    <div class="analytics-course-name">{{ cd.course.title }}</div>
+    <div class="analytics-course-meta">
+      {% if cd.avg_rating %}
+      <div class="analytics-rating">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#E75E24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        {{ cd.avg_rating }}/5
+      </div>
+      {% endif %}
+      <div style="font-size:0.82rem;color:#9CA3AF;">{{ cd.course.lesson_count }} lesson{{ cd.course.lesson_count|pluralize }}</div>
+      <div class="analytics-course-earned">+${{ cd.total_usd }}</div>
+    </div>
+  </div>
+
+  {% if cd.lessons %}
+  <div class="analytics-lesson-header">
+    <div>Lesson</div>
+    <div style="text-align:center">Views</div>
+    <div style="text-align:center">Earned</div>
+    <div style="text-align:center">Rating</div>
+  </div>
+  {% for ld in cd.lessons %}
+  <div class="analytics-lesson-row">
+    <div class="analytics-lesson-name">{{ ld.lesson.title }}</div>
+    <div class="analytics-lesson-stat">{{ ld.views }}</div>
+    <div class="analytics-lesson-stat green">{% if ld.usd > 0 %}+${{ ld.usd }}{% else %}—{% endif %}</div>
+    <div class="analytics-lesson-stat">
+      {% if ld.avg_rating %}
+      <span style="color:#E75E24;font-weight:700;">{{ ld.avg_rating }}</span>
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div style="text-align:center;padding:64px;color:#9CA3AF;">
+  No courses yet. Create your first course to see analytics here.
+</div>
+{% endif %}
+{% endblock %}

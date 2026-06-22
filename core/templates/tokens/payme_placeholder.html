@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Complete Purchase — Edflix{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/tokens.css' %}">{% endblock %}
+{% block content %}
+<div class="centered-page">
+  <div class="payme-placeholder-card">
+    <div class="payme-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    </div>
+    <h2>Payment Integration Coming Soon</h2>
+    <div class="payme-plan-info">
+      <span class="payme-plan-name">{{ plan.name }} Plan</span>
+      <span class="payme-plan-detail">${{ plan.price_usd }} · {{ plan.tokens }} tokens</span>
+    </div>
+    <p>The Payme payment gateway integration is currently being configured. Secure online payment will be available very soon.</p>
+    <p class="payme-note">Once enabled, you'll be able to complete this purchase directly through Payme — Uzbekistan's trusted payment system.</p>
+    <a href="{% url 'buy_tokens' %}" class="btn-secondary">← Back to Plans</a>
+  </div>
+</div>
+{% endblock %}

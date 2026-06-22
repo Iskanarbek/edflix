@@ -1,0 +1,91 @@
+{% extends 'teacher/base.html' %}
+{% block title %}{{ action }} Course — Teacher Panel{% endblock %}
+{% block nav_create %}{% if action == 'Create' %}active{% endif %}{% endblock %}
+
+{% block content %}
+<div class="panel-header">
+  <h1 class="panel-page-title">{{ action }} Course</h1>
+  <p class="panel-page-sub">{% if action == 'Create' %}Add a new course to your library{% else %}Update course details{% endif %}</p>
+</div>
+
+{% if error %}
+<div class="auth-error" style="max-width:640px;margin-bottom:16px;">{{ error }}</div>
+{% endif %}
+
+<div class="panel-form-wrap">
+  <form method="post" enctype="multipart/form-data" class="panel-form">
+    {% csrf_token %}
+
+    <div class="panel-field">
+      <label class="panel-label">Course Title</label>
+      <input type="text" name="title" class="panel-input" placeholder="e.g. IELTS Band 7+ Complete Course"
+             value="{{ course.title|default:'' }}" required>
+    </div>
+
+    <div class="panel-field">
+      <label class="panel-label">Category</label>
+      <select name="category" class="panel-select" required>
+        <option value="">Select category…</option>
+        {% for key, label in category_choices %}
+        <option value="{{ key }}" {% if course.category == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="panel-field">
+      <label class="panel-label">Description</label>
+      <textarea name="description" class="panel-textarea" placeholder="What will students learn? What makes this course unique?" required>{{ course.description|default:'' }}</textarea>
+    </div>
+
+    <div class="panel-field">
+      <label class="panel-label">Cover Photo</label>
+      {% if course.thumbnail %}
+      <div style="margin-bottom:8px;">
+        <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" style="width:200px;height:113px;object-fit:cover;border-radius:6px;border:1px solid #252525;">
+        <span style="display:block;font-size:0.75rem;color:#5a5040;margin-top:4px;">Current photo — upload new to replace</span>
+      </div>
+      {% endif %}
+      <label class="panel-file-label">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Choose image (JPG/PNG)
+        <input type="file" name="thumbnail" class="panel-file-input" accept="image/*" id="thumbnailInput">
+      </label>
+      <span id="thumbnailName" class="panel-hint" style="margin-top:4px;"></span>
+    </div>
+
+    <div class="panel-field">
+      <label class="panel-label">Introduction Video <span style="color:var(--text-muted);font-size:0.78rem;font-weight:400;">(Free preview for students — optional)</span></label>
+      {% if course.intro_video %}
+      <div style="margin-bottom:8px;">
+        <video src="{{ course.intro_video.url }}" style="width:260px;border-radius:6px;border:1px solid #252525;" controls></video>
+        <span style="display:block;font-size:0.75rem;color:#5a5040;margin-top:4px;">Current intro video — upload new to replace</span>
+      </div>
+      {% endif %}
+      <label class="panel-file-label">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Choose intro video (MP4)
+        <input type="file" name="intro_video" class="panel-file-input" accept="video/*" id="introVideoInput">
+      </label>
+      <span id="introVideoName" class="panel-hint" style="margin-top:4px;"></span>
+      <span class="panel-hint">Students watch this free before buying. No files or tests here — just the intro video.</span>
+    </div>
+
+    <div class="panel-actions">
+      <button type="submit" class="btn-panel-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        {{ action }} Course
+      </button>
+      <a href="{% url 'teacher_dashboard' %}" class="btn-panel-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.getElementById('thumbnailInput').addEventListener('change', function() {
+  document.getElementById('thumbnailName').textContent = this.files[0] ? this.files[0].name : '';
+});
+document.getElementById('introVideoInput').addEventListener('change', function() {
+  document.getElementById('introVideoName').textContent = this.files[0] ? this.files[0].name : '';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Introduction — {{ course.title }} — Edflix{% endblock %}
+{% block content %}
+<div class="intro-page">
+
+  <div class="intro-breadcrumb">
+    <a href="{% url 'section_list' %}">Tracks</a> ›
+    <a href="{% url 'section_courses' course.category %}">{{ course.get_category_display }}</a> ›
+    <span>{{ course.title }}</span>
+  </div>
+
+  <h1 class="intro-course-title">{{ course.title }}</h1>
+  <p class="intro-course-sub">Watch the introduction below, then read and sign the Course Agreement to unlock all lessons.</p>
+
+  {% if course.intro_video %}
+  <div class="intro-video-wrap">
+    <video controls controlsList="nodownload" class="intro-video">
+      <source src="{{ course.intro_video.url }}">
+    </video>
+  </div>
+  {% endif %}
+
+  {% if has_agreed %}
+  <div class="intro-already-agreed">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    You have already signed the Course Agreement for this course. All lessons are unlocked.
+    {% with first=course.lessons.first %}
+    {% if first %}
+    <a href="{% url 'lesson_detail' first.id %}" class="btn-agree" style="margin-top:16px;display:inline-flex;">Go to Lessons →</a>
+    {% endif %}
+    {% endwith %}
+  </div>
+  {% else %}
+
+  <div class="agreement-block">
+    <div class="agreement-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div>
+        <div class="agreement-title">EDFLIX PLATFORM — COURSE CONTENT LICENSE AND USAGE AGREEMENT</div>
+        <div class="agreement-subtitle">Legally binding — read carefully before proceeding</div>
+      </div>
+    </div>
+
+    <div class="agreement-body">
+      <p>This Course Content License and Usage Agreement (<strong>"Agreement"</strong>) is a legally binding contract between you (<strong>"User"</strong>, <strong>"you"</strong>, <strong>"your"</strong>) and Edflix Educational Platform (<strong>"Edflix"</strong>, <strong>"we"</strong>, <strong>"us"</strong>, <strong>"our"</strong>) governing your access to and use of all course materials, video content, written materials, downloadable files, assessments, and any other content made available through this course on the Edflix platform.</p>
+
+      <p><strong>BY CHECKING THE BOX BELOW AND CLICKING "I AGREE — UNLOCK THIS COURSE," YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE LEGALLY BOUND BY ALL TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS IN THEIR ENTIRETY, YOU MAY NOT ACCESS THE COURSE CONTENT.</strong></p>
+
+      <h4>1. GRANT OF LICENSE</h4>
+      <p>Edflix grants you a limited, non-exclusive, non-transferable, revocable license to access and view the course materials solely for your personal, non-commercial educational purposes. This license does not include any right to sublicense, distribute, reproduce, publicly perform, publicly display, or create derivative works from any course content, in whole or in part, without the prior written consent of Edflix.</p>
+
+      <h4>2. INTELLECTUAL PROPERTY AND COPYRIGHT</h4>
+      <p>All content within this course — including but not limited to video recordings, audio content, written materials, presentation slides, assessments and test questions, downloadable files, graphic elements, and design — is the exclusive intellectual property of Edflix and/or its licensed instructors and is protected under applicable international copyright law, trade secret law, and other intellectual property regulations. Unauthorized reproduction or distribution of copyrighted material constitutes copyright infringement and may subject the infringing party to significant civil and criminal liability under applicable law.</p>
+
+      <h4>3. STRICTLY PROHIBITED ACTIVITIES</h4>
+      <p>You expressly agree and warrant that you will NOT, under any circumstances:</p>
+      <ul>
+        <li>Record, screen-capture, screenshot, photograph, or otherwise reproduce any portion of the video, audio, or written content by any means whatsoever;</li>
+        <li>Download, copy, or save any video content through any technical means, including but not limited to browser extensions, screen recording software, third-party download tools, or network interception;</li>
+        <li>Redistribute, resell, share, publish, broadcast, transmit, upload, stream, or otherwise make available any course content to any third party through any medium or channel, including but not limited to social media platforms, video sharing websites, messaging applications, or peer-to-peer networks;</li>
+        <li>Use any course content, in whole or in part, for commercial purposes, for training or instructing others, or for the financial benefit of any third party without the prior express written permission of Edflix;</li>
+        <li>Remove, alter, obscure, or circumvent any copyright notices, watermarks, digital rights management systems, or proprietary notices embedded in or attached to any content;</li>
+        <li>Attempt to circumvent, disable, reverse engineer, or otherwise interfere with any security, access control, or technological protection measures implemented by Edflix;</li>
+        <li>Share your account credentials, login information, or access to course content with any other person or entity;</li>
+        <li>Create any derivative work, adaptation, translation, or modification of any course content without express written authorization.</li>
+      </ul>
+
+      <h4>4. ENFORCEMENT AND LEGAL CONSEQUENCES</h4>
+      <p>Edflix takes the protection of its intellectual property with the utmost seriousness and actively monitors and enforces its rights. Any violation of this Agreement may result in one or more of the following:</p>
+      <ul>
+        <li>Immediate and permanent termination of your account and access to all course materials, without notice and without refund of any tokens or fees paid;</li>
+        <li>Civil legal action seeking compensatory damages, statutory damages (which may reach substantial amounts per act of infringement under applicable copyright law), recovery of legal fees, court costs, and injunctive relief to prevent further infringement;</li>
+        <li>Criminal prosecution and referral to relevant law enforcement authorities under applicable criminal copyright law;</li>
+        <li>Public disclosure of the violation to the extent permitted by applicable law.</li>
+      </ul>
+      <p>The remedies set forth in this Agreement are cumulative and not exclusive of any other rights or remedies available to Edflix at law or in equity.</p>
+
+      <h4>5. NO WARRANTY ON EXTERNAL USE</h4>
+      <p>The course content is provided solely for educational purposes within the Edflix platform. Edflix makes no warranty that the content is appropriate or sufficient for purposes outside those described in this Agreement. Any use of the content outside the scope of this Agreement is entirely at your own risk.</p>
+
+      <h4>6. LEGAL JURISDICTION AND GOVERNING LAW</h4>
+      <p>This Agreement shall be governed by and construed in accordance with applicable law. You irrevocably agree to submit to the exclusive jurisdiction of the competent courts for resolution of any dispute, claim, or controversy arising out of or relating to this Agreement or the breach thereof.</p>
+
+      <h4>7. ENTIRE AGREEMENT AND SEVERABILITY</h4>
+      <p>This Agreement constitutes the entire agreement between you and Edflix regarding your access to and use of course content, and supersedes all prior or contemporaneous communications and proposals, whether oral or written. If any provision of this Agreement is found to be unenforceable or invalid, that provision shall be modified to the minimum extent necessary to make it enforceable, and all remaining provisions shall remain in full force and effect.</p>
+
+      <h4>8. ACKNOWLEDGMENT</h4>
+      <p>By proceeding, you acknowledge and confirm that: (i) you have read this Agreement in its entirety and understand its terms; (ii) you have the legal capacity and authority to enter into this Agreement; (iii) you agree to be legally bound by all terms and conditions set forth herein; and (iv) Edflix is relying on your representations in granting you access to the course content.</p>
+
+      <div class="agreement-stamp">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        This is a legally binding agreement. Your IP address, date, and time of agreement will be recorded.
+      </div>
+    </div>
+
+    <form method="post" class="agreement-form-inline">
+      {% csrf_token %}
+      <label class="agreement-checkbox-label">
+        <input type="checkbox" name="agree" value="1" required class="agreement-checkbox">
+        <span>I have read, understood, and agree to all terms of the Course Content License and Usage Agreement above. I understand this is a legally binding contract.</span>
+      </label>
+      <button type="submit" class="btn-agree">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        I Agree — Unlock This Course
+      </button>
+    </form>
+  {% endif %}
+  </div>
+
+</div>
+{% endblock %}

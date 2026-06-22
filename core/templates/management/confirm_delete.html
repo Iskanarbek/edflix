@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Delete — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/management.css' %}">
+</head>
+<body class="panel-login-body">
+  <div class="panel-login-card" style="text-align:center;">
+    <div style="width:56px;height:56px;background:#2e0d0d;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    </div>
+    <h2 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:10px;">Delete {{ object_type }}?</h2>
+    <p style="color:#7a6040;font-size:0.88rem;margin-bottom:8px;">
+      <strong style="color:#a09070;">{{ object }}</strong>
+    </p>
+    <p style="color:#5a5040;font-size:0.84rem;margin-bottom:28px;">This action is permanent and cannot be undone.</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger" style="padding:11px 24px;font-size:0.9rem;">Yes, Delete</button>
+      </form>
+      <a href="{{ back_url }}" class="btn-panel-ghost" style="padding:11px 22px;font-size:0.9rem;">Cancel</a>
+    </div>
+  </div>
+</body>
+</html>

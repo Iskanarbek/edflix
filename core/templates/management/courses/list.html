@@ -1,0 +1,60 @@
+{% extends 'management/base.html' %}
+{% block title %}Courses — Edflix Admin{% endblock %}
+{% block nav_courses %}active{% endblock %}
+{% block page_title %}Courses{% endblock %}
+{% block content %}
+<div class="mgmt-section">
+  <div class="mgmt-section-header">
+    <h2>All Courses</h2>
+    <a href="{% url 'mgmt_course_create' %}" class="btn-mgmt-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Course
+    </a>
+  </div>
+
+  {% if grouped_courses %}
+    {% for teacher_email, teacher_courses in grouped_courses.items %}
+    <div class="teacher-group">
+      <div class="teacher-group-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>{{ teacher_email }}</span>
+        <span class="teacher-course-count">{{ teacher_courses|length }} course{{ teacher_courses|length|pluralize }}</span>
+      </div>
+      <table class="mgmt-table mgmt-table-full">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Lessons</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in teacher_courses %}
+          <tr>
+            <td>
+              <div class="course-row-title">{{ course.title }}</div>
+              <div class="course-row-desc">{{ course.description|truncatechars:60 }}</div>
+            </td>
+            <td><span class="category-pill category-{{ course.category }}">{{ course.get_category_display }}</span></td>
+            <td>{{ course.lesson_count }}</td>
+            <td>
+              <div class="action-btns">
+                <a href="{% url 'mgmt_lesson_list' course.id %}" class="btn-action btn-view">Lessons</a>
+                <a href="{% url 'mgmt_course_edit' course.id %}" class="btn-action btn-edit">Edit</a>
+                <a href="{% url 'mgmt_course_delete' course.id %}" class="btn-action btn-delete">Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="mgmt-empty">
+    <p>No courses yet. <a href="{% url 'mgmt_course_create' %}">Create your first course →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'teacher/base.html' %}
+{% block title %}Connect Card — Teacher Panel{% endblock %}
+{% block nav_card %}active{% endblock %}
+
+{% block content %}
+<div class="panel-header">
+  <h1 class="panel-page-title">Card & Withdrawals</h1>
+  <p class="panel-page-sub">Connect your Visa card to receive earnings</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:800px;margin-bottom:28px;">
+  <div class="stat-card">
+    <div class="stat-label">Available Balance</div>
+    <div class="stat-value green">+${{ teacher.earned_usd }}</div>
+    <div class="stat-sub">{{ teacher.tokens_earned }} tokens</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Card Status</div>
+    {% if teacher.has_card %}
+    <div class="stat-value" style="font-size:1.1rem;color:var(--panel-green);margin-top:6px;">✓ Connected</div>
+    <div class="stat-sub">Visa •••• {{ teacher.card_number|slice:"-4:" }} · {{ teacher.card_expiry }}</div>
+    {% else %}
+    <div class="stat-value" style="font-size:1rem;color:#9CA3AF;margin-top:6px;">Not connected</div>
+    <div class="stat-sub">Add your card below</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="panel-form-wrap">
+  <form method="post" class="panel-form">
+    {% csrf_token %}
+    <div class="panel-field">
+      <label class="panel-label">Card Number</label>
+      <input type="text" name="card_number" class="panel-input"
+             value="{{ teacher.card_number }}"
+             placeholder="8600 0000 0000 0000" maxlength="19" id="cardNum"
+             autocomplete="cc-number">
+      <span class="panel-hint">Enter your Visa card number (16 digits)</span>
+    </div>
+    <div class="panel-field" style="max-width:160px;">
+      <label class="panel-label">Expiry (MM/YY)</label>
+      <input type="text" name="card_expiry" class="panel-input"
+             value="{{ teacher.card_expiry }}"
+             placeholder="09/27" maxlength="5" id="cardExpiry"
+             autocomplete="cc-exp">
+    </div>
+    <div class="panel-actions">
+      <button type="submit" class="btn-panel-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        {% if teacher.has_card %}Update Card{% else %}Connect Card{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+{% if teacher.withdrawals.exists %}
+<div style="margin-top:36px;">
+  <div class="panel-section-label" style="margin-bottom:14px;">Withdrawal History</div>
+  <div class="panel-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Card</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in teacher.withdrawals.all|dictsortreversed:"requested_at" %}
+        <tr>
+          <td>{{ w.requested_at|date:"M d, Y" }}</td>
+          <td style="font-weight:700;color:var(--panel-green);">${{ w.amount_usd }}</td>
+          <td>•••• {{ w.card_number|slice:"-4:" }}</td>
+          <td>
+            <span class="status-pill status-{{ w.status }}">{{ w.status|capfirst }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<script>
+document.getElementById('cardNum').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'').slice(0,16);
+  this.value = v.replace(/(.{4})/g,'$1 ').trim();
+});
+document.getElementById('cardExpiry').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2,4);
+  this.value = v;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+/* ═══════════════════════════════════════════════
+   EDFLIX — Tokens / Buy Page
+   ═══════════════════════════════════════════════ */
+
+.tokens-page { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+
+.tokens-hero {
+  text-align: center; margin-bottom: 3rem;
+}
+.tokens-hero h1 {
+  font-size: 2rem; font-weight: 800; color: var(--navy-900);
+  letter-spacing: -0.03em; margin-bottom: 0.5rem;
+}
+.tokens-hero p { color: var(--slate-500); max-width: 500px; margin: 0 auto 1.5rem; }
+.current-tokens-display {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.6rem 1.25rem; border-radius: 999px;
+  background: var(--sky-50); border: 1px solid var(--sky-200);
+  font-size: 0.9rem; color: var(--sky-700);
+}
+.current-tokens-display strong { font-size: 1.1rem; }
+
+.plans-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem; margin-bottom: 3rem;
+}
+.plan-card {
+  background: var(--white); border-radius: var(--radius-xl);
+  border: 1.5px solid var(--slate-200); padding: 2rem 1.75rem;
+  text-align: center; transition: all var(--transition);
+  position: relative;
+}
+.plan-card:hover { border-color: var(--sky-300); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.plan-featured {
+  border-color: var(--sky-400);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15), var(--shadow-md);
+  background: linear-gradient(160deg, var(--sky-50) 0%, var(--white) 100%);
+}
+.plan-badge {
+  position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);
+  background: var(--sky-500); color: var(--white);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 0.3rem 0.85rem; border-radius: 999px;
+}
+.plan-name { font-size: 0.9rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+.plan-price { font-size: 2.5rem; font-weight: 900; color: var(--navy-900); letter-spacing: -0.04em; margin-bottom: 0.25rem; }
+.plan-tokens { font-size: 1rem; font-weight: 700; color: var(--sky-600); margin-bottom: 1.5rem; }
+.plan-perks { list-style: none; text-align: left; margin-bottom: 1.75rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.plan-perks li { font-size: 0.875rem; color: var(--slate-600); display: flex; align-items: center; gap: 0.5rem; }
+.btn-buy-plan {
+  display: block; width: 100%;
+  padding: 0.85rem; border-radius: var(--radius-md);
+  background: var(--slate-100); color: var(--navy-800);
+  font-weight: 700; font-size: 0.95rem;
+  transition: all var(--transition); border: none;
+}
+.btn-buy-plan:hover { background: var(--slate-200); }
+.btn-buy-featured {
+  background: linear-gradient(135deg, var(--sky-500), var(--sky-600));
+  color: var(--white); box-shadow: var(--shadow-sky);
+}
+.btn-buy-featured:hover { background: linear-gradient(135deg, var(--sky-600), var(--sky-700)); transform: translateY(-1px); }
+.plan-per-lesson { font-size: 0.75rem; color: var(--slate-400); margin-top: 0.75rem; }
+
+.tokens-info { }
+.tokens-info-card {
+  background: var(--slate-50); border-radius: var(--radius-lg);
+  border: 1px solid var(--slate-200); padding: 1.75rem;
+}
+.tokens-info-card h3 { font-size: 1rem; font-weight: 700; color: var(--navy-900); margin-bottom: 0.75rem; }
+.tokens-info-card ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+.tokens-info-card li { font-size: 0.875rem; color: var(--slate-600); line-height: 1.6; }
+
+/* ── Payme Placeholder ── */
+.payme-placeholder-card {
+  background: var(--white); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg); padding: 3rem 2.5rem;
+  text-align: center; max-width: 480px; width: 100%;
+  border: 1px solid var(--slate-200);
+}
+.payme-icon { color: var(--slate-300); margin-bottom: 1.5rem; }
+.payme-placeholder-card h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; }
+.payme-plan-info {
+  display: flex; align-items: center; justify-content: center; gap: 1rem;
+  padding: 0.75rem 1.5rem; border-radius: var(--radius-md);
+  background: var(--sky-50); border: 1px solid var(--sky-200);
+  margin-bottom: 1.5rem;
+}
+.payme-plan-name { font-weight: 700; color: var(--navy-900); }
+.payme-plan-detail { font-size: 0.875rem; color: var(--sky-600); font-weight: 600; }
+.payme-placeholder-card p { font-size: 0.9rem; color: var(--slate-500); line-height: 1.7; margin-bottom: 0.75rem; }
+.payme-note { font-size: 0.82rem; color: var(--slate-400); margin-bottom: 2rem !important; }
+
+@media (max-width: 768px) {
+  .plans-grid { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
+}
